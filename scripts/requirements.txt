@@ -1,0 +1,13 @@
+# Python dependencies for the Photo Studio face recognition backend
+# Install with: pip install -r requirements.txt
+#
+# Note: insightface will download its 'buffalo_l' model (~300MB) automatically
+# the first time it runs. This requires an internet connection ONCE, after
+# which everything works fully offline.
+
+flask==3.0.3
+flask-cors==4.0.1
+opencv-python==4.10.0.84
+numpy==1.26.4
+insightface==0.7.3
+onnxruntime==1.18.1
