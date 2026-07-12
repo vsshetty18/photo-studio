@@ -1,17 +1,13 @@
 /**
  * lib/api.ts
  * -----------
- * Small helper functions that call the local Flask backend (localhost:5000).
- * Keeping all fetch() calls here means page.tsx stays clean and readable.
+ * Small helper functions that call the Flask backend.
+ * API_BASE comes from an environment variable so it works both
+ * locally (localhost:5000) and when deployed (your Render URL).
  */
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-/**
- * Tells the backend to rescan /photos and rebuild face-index.json.
- * force_all = true reprocesses every photo (used by "Rebuild Face Index" button).
- * force_all = false only processes new photos (used automatically on "Load Photos").
- */
 export async function rebuildIndex(forceAll: boolean = false): Promise<{ total_indexed_photos: number }> {
   const res = await fetch(`${API_BASE}/rebuild-index`, {
     method: "POST",
@@ -26,10 +22,6 @@ export async function rebuildIndex(forceAll: boolean = false): Promise<{ total_i
   return res.json();
 }
 
-/**
- * Sends a captured webcam frame (base64 JPEG data URL) to the backend,
- * gets back a list of matching photo filenames.
- */
 export async function scanFace(imageDataUrl: string): Promise<{ matches: string[]; error?: string }> {
   const res = await fetch(`${API_BASE}/scan-face`, {
     method: "POST",
@@ -44,10 +36,6 @@ export async function scanFace(imageDataUrl: string): Promise<{ matches: string[
   return res.json();
 }
 
-/**
- * Builds the full URL for a given photo filename so it can be used
- * directly in an <img src="..."> tag.
- */
 export function getPhotoUrl(filename: string): string {
   return `${API_BASE}/photos/${encodeURIComponent(filename)}`;
 }
