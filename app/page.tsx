@@ -7,7 +7,7 @@
  * together Toolbar, WebcamCapture, and PhotoGrid.
  *
  * Flow:
- *   1. "Load Photos" -> incrementally index any new photos in /photos
+ *   1. "Load Photos" -> pick a folder of images -> upload to backend -> indexed
  *   2. "Scan Face"    -> open webcam -> capture -> send to backend -> get matches
  *   3. Click photos in the grid to select/deselect them
  *   4. "Print Selected" -> opens a print-friendly view -> browser print dialog
@@ -18,7 +18,7 @@ import { useState } from "react";
 import Toolbar from "@/components/Toolbar";
 import WebcamCapture from "@/components/WebcamCapture";
 import PhotoGrid from "@/components/PhotoGrid";
-import { rebuildIndex, scanFace, getPhotoUrl } from "@/lib/api";
+import { rebuildIndex, scanFace, getPhotoUrl, uploadPhotos } from "@/lib/api";
 
 export default function Home() {
   const [matches, setMatches] = useState<string[]>([]);
@@ -27,15 +27,17 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
 
-  // ---- 📂 Load Photos: incremental index update ---------------------
-  async function handleLoadPhotos() {
+  // ---- 📂 Load Photos: pick a folder, upload it to the backend ---------
+  async function handleLoadPhotos(files: FileList) {
     setIsLoading(true);
-    setStatusMessage("Scanning /photos for new images...");
+    setStatusMessage(`Uploading ${files.length} photo(s)...`);
     try {
-      const result = await rebuildIndex(false);
-      setStatusMessage(`Loaded. ${result.total_indexed_photos} photo(s) indexed in total.`);
+      const result = await uploadPhotos(files);
+      setStatusMessage(
+        `Uploaded ${result.uploaded} photo(s). ${result.total_indexed_photos} total indexed.`
+      );
     } catch (err) {
-      setStatusMessage("Error loading photos. Is the Python server running?");
+      setStatusMessage("Error uploading photos. Is the Python server running?");
     } finally {
       setIsLoading(false);
     }
