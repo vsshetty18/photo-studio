@@ -39,3 +39,24 @@ export async function scanFace(imageDataUrl: string): Promise<{ matches: string[
 export function getPhotoUrl(filename: string): string {
   return `${API_BASE}/photos/${encodeURIComponent(filename)}`;
 }
+/**
+ * Uploads a folder of photos selected in the browser to the backend,
+ * which saves them into /photos and indexes them.
+ */
+export async function uploadPhotos(files: FileList): Promise<{ uploaded: number; total_indexed_photos: number }> {
+  const formData = new FormData();
+  Array.from(files).forEach((file) => {
+    formData.append("photos", file);
+  });
+
+  const res = await fetch(`${API_BASE}/upload-photos`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to upload photos");
+  }
+
+  return res.json();
+}
