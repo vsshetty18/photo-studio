@@ -1,0 +1,26 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+# Python
+scripts/venv/
+scripts/__pycache__/
+*.pyc
+
+# InsightFace downloaded models (large, auto-downloaded on first run)
+scripts/.insightface/
+~/.insightface/
+
+# Generated face index (contains embeddings, regenerate locally instead)
+face-index.json
+
+# Customer photos (private data — don't commit real customer photos)
+photos/*
+!photos/.gitkeep
+
+# Env / OS files
+.env
+.env.local
+.DS_Store
