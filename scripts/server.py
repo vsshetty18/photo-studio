@@ -44,7 +44,40 @@ def rebuild_index_route():
     force_all = body.get("force_all", False)
     index = rebuild_index(force_all=force_all)
     return jsonify({"status": "ok", "total_indexed_photos": len(index)})
+from werkzeug.utils import secure_filename
 
+@app.route("/upload-photos", methods=["POST"])
+def upload_photos_route():
+    """
+    Receives multiple image files from the browser (a folder selected
+    in the frontend), saves them into /photos, and indexes any new ones.
+    """
+    if not os.path.exists(PHOTOS_DIR):
+        os.makedirs(PHOTOS_DIR)
+
+    uploaded_files = request.files.getlist("photos")
+    if not uploaded_files:
+        return jsonify({"error": "No files received"}), 400
+
+    saved_count = 0
+    for file in uploaded_files:
+        if file.filename == "":
+            continue
+        filename = secure_filename(os.path.basename(file.filename))
+        if not filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+            continue
+        filepath = os.path.join(PHOTOS_DIR, filename)
+        file.save(filepath)
+        saved_count += 1
+
+    # Index only the newly saved photos (existing ones are skipped automatically)
+    index = rebuild_index(force_all=False)
+
+    return jsonify({
+        "status": "ok",
+        "uploaded": saved_count,
+        "total_indexed_photos": len(index)
+    })
 
 @app.route("/scan-face", methods=["POST"])
 def scan_face_route():
