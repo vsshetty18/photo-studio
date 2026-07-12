@@ -3,18 +3,17 @@
 /**
  * components/Toolbar.tsx
  * -------------------------
- * The 4 main action buttons for the app:
- *   📂 Load Photos        - rescans /photos for new images (quick, incremental)
+ * The 4 main action buttons:
+ *   📂 Load Photos        - opens a folder picker, uploads photos to backend
  *   📸 Scan Face           - opens webcam to scan a customer's face
  *   🖨 Print Selected      - sends selected photos to the print dialog
  *   🔄 Rebuild Face Index  - force re-processes ALL photos from scratch
- *
- * Kept as one component since it's just a row of buttons calling
- * functions passed down from page.tsx.
  */
 
+import { useRef } from "react";
+
 interface ToolbarProps {
-  onLoadPhotos: () => void;
+  onLoadPhotos: (files: FileList) => void;
   onScanFace: () => void;
   onPrintSelected: () => void;
   onRebuildIndex: () => void;
@@ -30,9 +29,34 @@ export default function Toolbar({
   selectedCount,
   isLoading,
 }: ToolbarProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleLoadClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      onLoadPhotos(e.target.files);
+    }
+    e.target.value = ""; // reset so picking the same folder again still works
+  }
+
   return (
     <div className="toolbar">
-      <button onClick={onLoadPhotos} disabled={isLoading} className="btn btn-primary">
+      {/* Hidden input - webkitdirectory lets the user pick a whole folder (Chrome/Edge) */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        // @ts-ignore - webkitdirectory is non-standard but works in Chrome/Edge
+        webkitdirectory="true"
+        multiple
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleFilesSelected}
+      />
+
+      <button onClick={handleLoadClick} disabled={isLoading} className="btn btn-primary">
         📂 Load Photos
       </button>
 
