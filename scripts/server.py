@@ -2,8 +2,6 @@
 server.py
 ----------
 Tiny Flask API that the Next.js frontend talks to.
-(Same as before, with two changes for deployment: dynamic PORT,
-and CORS restricted to your frontend's domain.)
 """
 
 import os
@@ -19,10 +17,11 @@ from build_index import rebuild_index, load_index, PHOTOS_DIR
 
 app = Flask(__name__)
 
-# Only allow requests from your deployed frontend (replace with your real Vercel URL)
+# Allow both your production URL and current preview URL
 CORS(app, origins=[
     "http://localhost:3000",
-    "https://photo-studio-azure.vercel.app/"
+    "https://photo-studio-azure.vercel.app",
+    "https://photo-studio-qt0zzsy4w-v-s-vs-projects.vercel.app"
 ])
 
 
