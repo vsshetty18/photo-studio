@@ -22,7 +22,7 @@ app = Flask(__name__)
 # Only allow requests from your deployed frontend (replace with your real Vercel URL)
 CORS(app, origins=[
     "http://localhost:3000",
-    "https://photo-studio-yourname.vercel.app"
+    "https://photo-studio-azure.vercel.app/"
 ])
 
 
