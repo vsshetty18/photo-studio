@@ -93,7 +93,7 @@ def upload_photos_route():
         if file.filename == "":
             continue
         filename = secure_filename(os.path.basename(file.filename))
-        if not filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+        if not filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".heic")):
             continue
         filepath = os.path.join(PHOTOS_DIR, filename)
         file.save(filepath)
